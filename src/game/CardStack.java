@@ -3,6 +3,8 @@ package game;
 import java.util.LinkedList;
 import java.util.Random;
 
+import game.gamemodes.NormalOrder;
+
 public class CardStack {
     
     public CardStack() {
@@ -29,6 +31,12 @@ public class CardStack {
         }
 
         stack = newStack;
+    }
+
+    // must remove this, just for testing!!
+    public void sort()
+    {
+        stack.sort(new NormalOrder());
     }
 
     public Card draw() {

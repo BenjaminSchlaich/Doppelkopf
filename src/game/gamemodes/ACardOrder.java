@@ -1,9 +1,12 @@
 
 package game.gamemodes;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Set;
 
 import game.Card;
+import game.Color;
 
 /**
  * This class provides a Order for the Cards registered in a match.
@@ -15,7 +18,10 @@ public abstract class ACardOrder implements Comparator<Card> {
 
     public void receiveRoundOpening(Card c)
     {
-        lastRoundOpening = c;
+        if(isTrump(c))
+            roundColor = null;
+        else
+            roundColor = c.c;
 
         computeOrder();
     }
@@ -31,18 +37,19 @@ public abstract class ACardOrder implements Comparator<Card> {
 
     private int findOrdinal(Card c)
     {
-        for(int i=0; i<order.length; i++)
-            for(int j=0; j<order[i].length; j++)
-                if(order[i][j] == c)
-                    return i;
+        for(int i=0; i<order.size(); i++)
+            if(order.get(i).contains(c))
+                return i;
         
         return -1;
     }
 
+    protected abstract boolean isTrump(Card c);
+
     protected abstract void computeOrder();
 
-    protected Card lastRoundOpening;
+    protected Color roundColor = null;
 
-    protected static Card[][] order;
+    protected ArrayList<Set<Card>> order;
     
 }
