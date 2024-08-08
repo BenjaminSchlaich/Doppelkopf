@@ -7,8 +7,8 @@ public class Card {
 
         this.v = v;
         this.c = c;
-        fuchs = v == Value.Ace && c == Color.Diamonds;
-        dulle = v == Value.King && c == Color.Hearts;
+        fuchs = v == Value.Ass && c == Color.Karo;
+        dulle = v == Value.Zehn && c == Color.Herz;
     }
 
     public String toString() {

@@ -1,5 +1,5 @@
 package game;
 
 public enum Color {
-    Cross, Spades, Hearts, Diamonds
+    Kreuz, Pik, Herz, Karo
 }

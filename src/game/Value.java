@@ -1,5 +1,5 @@
 package game;
 
 public enum Value {
-    Ace, King, Queen, Jack, Ten, Nine
+    Ass, Zehn, König, Dame, Bube, Neun
 }

@@ -1,10 +1,7 @@
 
 package game.gamemodes;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Set;
-
 import game.Card;
 import game.Color;
 
@@ -22,34 +19,13 @@ public abstract class ACardOrder implements Comparator<Card> {
             roundColor = null;
         else
             roundColor = c.c;
-
-        computeOrder();
     }
 
     @Override
-    public int compare(Card o1, Card o2)
-    {
-        if(findOrdinal(o1) <= findOrdinal(o2))
-            return 1;
-        else
-            return -1;
-    }
-
-    private int findOrdinal(Card c)
-    {
-        for(int i=0; i<order.size(); i++)
-            if(order.get(i).contains(c))
-                return i;
-        
-        return -1;
-    }
+    public abstract int compare(Card o1, Card o2);
 
     protected abstract boolean isTrump(Card c);
 
-    protected abstract void computeOrder();
-
     protected Color roundColor = null;
 
-    protected ArrayList<Set<Card>> order;
-    
 }
