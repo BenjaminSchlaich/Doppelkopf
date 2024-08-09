@@ -59,6 +59,8 @@ public class TableMaster {
 
         matchCardLog = new LinkedList<Card[]>();
 
+        roundStartLog = new LinkedList<Integer>();
+
         for(int round=0; round<12; round++)
             roundStartIndex = playRound(roundStartIndex);
         
@@ -145,7 +147,7 @@ public class TableMaster {
      * @param roundStartIndex Who will start playing?
      * @return returns the next roundStartIndex, i.e. the player who won the current round.
      */
-    public int playRound(int roundStartIndex)
+    private int playRound(int roundStartIndex)
     {
         Card[] cardsPlayed = new Card[4];
 
@@ -162,9 +164,24 @@ public class TableMaster {
 
         } while(i != roundStartIndex);
 
-        matchCardLog.add(cardsPlayed);
+        matchCardLog.add(cardsPlayed);              // log the cards played, so that consistency can be checked!
 
-        return roundStartIndex;
+        roundStartLog.add(roundStartIndex);         // without this log the matchCardLog is useless.
+
+        // find the winner
+        int iMax = 0;
+        Card cMax = cardsPlayed[0];
+        for(i=1; i<4; i++)
+            if(cardOrder.compare(cardsPlayed[i], cMax) > 0)
+            {
+                iMax = i;
+                cMax = cardsPlayed[i];
+            }
+        
+        for(i=0; i<4; i++)
+            agents[i].receiveRoundWinner(agents[iMax]);
+
+        return iMax;
     }
 
     private final AAgent[] agents;                  // the agents playing at this table
@@ -172,6 +189,8 @@ public class TableMaster {
     private ArrayList<List<Ansage>> agentAnsagen;   // logs the Ansagen that have been made during the current/last match
 
     private List<Card[]> matchCardLog;              // logs the cards that have been played during the current/last match
+
+    private List<Integer> roundStartLog;            // provides matchCardLog with the indices of the agent that came out.
 
     private ACardOrder cardOrder;                   // the card order that holds currently (during matches/rounds)
 

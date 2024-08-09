@@ -44,5 +44,11 @@ public interface IAgent {
      * @param p
      */
     public void receiveCard(Card c, IAgent p);
+
+    /**
+     * Agent is informed about who won the round, such that he doesn't have to check for himself.
+     * @param a the winner of the last round
+     */
+    public void receiveRoundWinner(IAgent a);
     
 }

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import game.gamemodes.ACardOrder;
 import game.gamemodes.NormalOrder;
 
-public class Hand {
+public final class Hand {
     
     public Hand(CardStack s)
     {
@@ -13,6 +13,11 @@ public class Hand {
 
         for(int i=0; i<12; i++)
             cards.push(s.draw());
+    }
+
+    @SuppressWarnings("unchecked")
+    public Hand(Hand initialHand) {
+        cards = (LinkedList<Card>) initialHand.cards.clone();
     }
 
     @SuppressWarnings("unchecked")
