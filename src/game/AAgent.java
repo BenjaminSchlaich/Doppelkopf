@@ -7,6 +7,11 @@ package game;
  *      he is informed about the other players, his hand of cards, and the gamemode that is to be played.
  */
 public abstract class AAgent implements IAgent {
+
+    public AAgent(String name)
+    {
+        this.name = name;
+    }
     
     public final void receiveHand(Hand h)
     {
@@ -20,6 +25,13 @@ public abstract class AAgent implements IAgent {
         this.right = right;
     }
 
+    @Override
+    public String toString()
+    {
+        return name;
+    }
+
+    private String name;
     protected Hand hand;
     protected IAgent left;
     protected IAgent middle;

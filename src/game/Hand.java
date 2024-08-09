@@ -31,8 +31,15 @@ public final class Hand {
         cards.sort(aco);
     }
 
-    public String toString() {
+    public Card playCard(int index)
+    {
+        Card c = cards.remove(index);
 
+        return c;
+    }
+
+    public String toString()
+    {
         String s = "";
 
         for(Card c: cards)

@@ -1,17 +1,22 @@
 
-import game.CardStack;
+import game.*;
+import logging.Log;
 
 public class App {
     public static void main(String[] args) throws Exception {
         
-        CardStack s = new CardStack();
+        AAgent[] players = new AAgent[4];
+        String[] names = new String[]{"Angela", "Viktor", "Bertha", "Thomas"};
 
-        s.shuffle();
+        for(int i=0; i<4; i++)
+            players[i] = new FullyRandomAgent(names[i]);
+        
+        Log l = new Log();
 
-        System.out.println("Shuffled card stack:\n" + s);
+        TableMaster tm = new TableMaster(players, l);
 
-        s.sort();
+        tm.playList(2);
 
-        System.out.println("Sorted card stack:\n" + s);
+        System.out.println(l);
     }
 }

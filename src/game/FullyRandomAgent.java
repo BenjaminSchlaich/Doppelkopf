@@ -7,6 +7,10 @@ import game.gamemodes.GameMode;
 
 public class FullyRandomAgent extends AAgent {
 
+    public FullyRandomAgent(String name) {
+        super(name);
+    }
+
     private Random rand = new Random();
 
     @Override
@@ -28,14 +32,20 @@ public class FullyRandomAgent extends AAgent {
 
     @Override
     public Card sendCard() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'sendCard'");
+        
+        int cardsLeft = hand.getCards().size();
+
+        return hand.playCard(rand.nextInt(cardsLeft));
     }
 
     @Override
     public void receiveCard(Card c, IAgent p) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'receiveCard'");
+        // what should a random player care?
+    }
+
+    @Override
+    public void receiveRoundWinner(IAgent a) {
+        // what should a random player care?
     }
     
 }

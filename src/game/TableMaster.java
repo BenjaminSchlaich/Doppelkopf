@@ -9,6 +9,7 @@ import game.gamemodes.ACardOrder;
 import game.gamemodes.GameMode;
 import game.gamemodes.GameModeStateMachine;
 import game.gamemodes.NormalOrder;
+import logging.Log;
 
 /**
  * The table master represents the entire table that plays.
@@ -18,7 +19,7 @@ import game.gamemodes.NormalOrder;
  */
 public class TableMaster {
 
-    public TableMaster(AAgent[] agents)
+    public TableMaster(AAgent[] agents, Log log)
     {
         if(agents.length != 4)
             throw new IllegalArgumentException("Match(): must construct with exactly 4 agents.");
@@ -44,7 +45,10 @@ public class TableMaster {
 
         for(int i=0; i<matchCound; i++)
         {
+            log.matchStarted(matchCound, agents);
+
             playMatch();
+
             matchStartIndex++;
         }
     }
@@ -97,39 +101,22 @@ public class TableMaster {
     {
         int i = matchStartIndex;
 
+        GameModeStateMachine.resetState();
+
         do
         {
-            Ansage a;
-            List<Ansage> valids = Arrays.asList(Ansage.values());
-
-            do
-            {
-                a = agents[i].sendAnsage(valids);               // ask the current agent for his Ansage
-                valids.remove(a);                               // prohibit the same one twice
-
-                if(a != Ansage.Nothing)
-                    agentAnsagen.get(i).add(a);                 // memorize all Ansagen, of course.
-                
-                GameModeStateMachine.updateState(a);            // figures out the game that will be played
-
-                for(int j=0; j<4; j++)                          // now tell all other agents about it
-                {
-                    if(j == i)
-                        continue;
-                    else
-                        agents[j].receiveAnsage(a, agents[i]);  // the agent himself must not be informed
-                }
-
-            } while(a != Ansage.Nothing);                       // and let any agent make as many unique Ansagen as they want.
+            askForAnsagen(i);
 
             i = (i+1) % 4;                                      // select the next agent
 
         } while(i != matchStartIndex);                          // until we reach the agent who made the Ansage
 
-        Pair<GameMode, IAgent> p = GameModeStateMachine.getState();
+        Pair<GameMode, AAgent> p = GameModeStateMachine.getState();
 
         for(i=0; i<4; i++)
             agents[i].receiveGameMode(p.first, p.second);
+        
+        log.gameModeChosen(p.first, p.second);
         
         switch(p.first)
         {
@@ -155,7 +142,11 @@ public class TableMaster {
 
         do
         {
+            askForAnsagen(i);
+
             cardsPlayed[i] = agents[i].sendCard();
+
+            log.cardPlayed(cardsPlayed[i], agents[i]);
 
             for(int j=0; j<4; j++)
                 agents[j].receiveCard(cardsPlayed[i], agents[i]);
@@ -184,6 +175,35 @@ public class TableMaster {
         return iMax;
     }
 
+    private void askForAnsagen(int agentIndex)
+    {
+        Ansage a;
+        List<Ansage> valids = Arrays.asList(Ansage.values());
+
+        do
+        {
+            a = agents[agentIndex].sendAnsage(valids);               // ask the current agent for his Ansage
+            valids.remove(a);                               // prohibit the same one twice
+
+            if(a != Ansage.Nothing)
+            {
+                agentAnsagen.get(agentIndex).add(a);                 // memorize all Ansagen, of course.
+                log.ansageMade(a, agents[agentIndex]);               // also log this event externally.
+            }                 
+            
+            GameModeStateMachine.updateState(a, agents[agentIndex]); // figures out the game that will be played
+
+            for(int j=0; j<4; j++)                          // now tell all other agents about it
+            {
+                if(j == agentIndex)
+                    continue;
+                else
+                    agents[j].receiveAnsage(a, agents[agentIndex]);  // the agent himself must not be informed
+            }
+
+        } while(a != Ansage.Nothing);                       // and let any agent make as many unique Ansagen as they want.
+    }
+
     private final AAgent[] agents;                  // the agents playing at this table
 
     private ArrayList<List<Ansage>> agentAnsagen;   // logs the Ansagen that have been made during the current/last match
@@ -195,4 +215,6 @@ public class TableMaster {
     private ACardOrder cardOrder;                   // the card order that holds currently (during matches/rounds)
 
     private int matchStartIndex;                    // index of the agent who starts the current/next match
+
+    private Log log;                                // this is just for external printing/logging of game info
 }
