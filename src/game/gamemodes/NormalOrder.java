@@ -67,7 +67,7 @@ public class NormalOrder extends ACardOrder {
             return -1;
     }
 
-    protected boolean isTrump(Card c)
+    public boolean isTrump(Card c)
     {
         if(c.dulle || c.v == Value.Dame || c.v == Value.Bube || c.c == Color.Karo)
             return true;

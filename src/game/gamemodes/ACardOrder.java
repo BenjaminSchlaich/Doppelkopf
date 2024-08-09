@@ -24,7 +24,7 @@ public abstract class ACardOrder implements Comparator<Card> {
     @Override
     public abstract int compare(Card o1, Card o2);
 
-    protected abstract boolean isTrump(Card c);
+    public abstract boolean isTrump(Card c);
 
     protected Color roundColor = null;
 

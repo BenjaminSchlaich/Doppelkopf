@@ -1,0 +1,29 @@
+
+        Inheritance of Competence:
+-   Have various layers of agents that make decisions better than the others,
+    but in case an agent doesn't know what to do, he gives the decision to the super agent.
+-   Possible layers:
+        -> Fully Random Agent:
+            This agent makes uniformly random decisions, out of all possibilities.
+        -> Ignorant Experienced Agent:
+            This agent makes decisions independent of the match, only based on general rules from my experience,
+            or some statistics of previous games. I.e., he will always play Normal, unless Armut is possible, in which case he will play Armut.
+            Because he plays uninformed and deterministic, he is still very easy to beat, but probably much better than random.
+            He will resort to the Random Agent, if no standard rule is specified for a case.
+        -> Score-Based Agent:
+            This agent assigns a simple score to each decision, based on the value of his cards. Each cards get's a score consisting of two dimensions.
+            One dimension is just the end score value of the card, and another one is some function of the order relation in the match.
+            He will resort to the Ignorant Experienced Agent, if all possible decisions have similar scores.
+        -> Exhaustive Probabilistic Search Agent
+            This agent will try to approximate the probabilities of winning for each decision, and choose according to that approximation.
+            He is therefore the most intelligent fully-automated Agent. He has a timeout assiged.
+            He resorts to the Score-Based Agent, in case of a timeout, or if no good decision is found.
+            If multiple good decisions are found, he restricts the behaviour of the Score-Based Agent to only those, and delegates.
+        -> Informed Experienced Agent
+            This agent just specifies some specific rules, but based on the current game state, of smart behaviour from my experience.
+            So he is similar to the Ignorant Experienced Agent, but these decision proposals will be much more reasonable.
+            He mostly resorts to the Exhaustive Probabilistic Agent, when no rule is applicable.
+        -> ...?
+-   This scheme allows incorporating prior experience, as well as exhaustive strategies.
+    Many layers ensure that cases of weakness of one strategy are simply handled by the next best strategy.
+        

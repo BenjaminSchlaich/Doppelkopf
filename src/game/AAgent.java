@@ -1,5 +1,7 @@
 package game;
 
+import java.util.List;
+
 /**
  * This interface declares the functionality that an agent (i.e. player) in the game must provide.
  * For a player to be able to participate, he must be able to:
@@ -19,7 +21,10 @@ public abstract class AAgent implements IAgent {
         this.middle = middle;
         this.right = right;
     }
-    
+
+    public abstract Ansage sendAnsage(List<Ansage> valid);
+    public abstract void receiveAnsage(Ansage a, IAgent p);
+
     protected Hand hand;
     protected IAgent left;
     protected IAgent middle;
