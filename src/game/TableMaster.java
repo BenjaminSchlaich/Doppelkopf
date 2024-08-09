@@ -34,6 +34,8 @@ public class TableMaster {
             agentAnsagen.add(new LinkedList<Ansage>());
         
         this.matchCardLog = null;
+
+        this.log = log;
     }
 
     /**
@@ -125,7 +127,7 @@ public class TableMaster {
                 break;
         
             default:
-                break;
+                cardOrder = new NormalOrder();
         }
     }
 
@@ -178,7 +180,7 @@ public class TableMaster {
     private void askForAnsagen(int agentIndex)
     {
         Ansage a;
-        List<Ansage> valids = Arrays.asList(Ansage.values());
+        List<Ansage> valids = new LinkedList<>(Arrays.asList(Ansage.values()));
 
         do
         {
