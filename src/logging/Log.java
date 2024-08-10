@@ -42,6 +42,11 @@ public class Log {
         logLevel(2, "Player " + ag + " played a " + ca + ".");
     }
 
+    public void roundWon(AAgent a)
+    {
+        logLevel(2, "Player " + a + " got the Stich.");
+    }
+
     @Override
     public String toString()
     {
@@ -55,7 +60,7 @@ public class Log {
 
     private void logLevel(int i, String s)
     {
-        s += "  ".repeat(i);
+        s = "  ".repeat(i) + s;
 
         logEntries.add(s);
     }

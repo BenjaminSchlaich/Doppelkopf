@@ -165,7 +165,7 @@ public class TableMaster {
         int iMax = 0;
         Card cMax = cardsPlayed[0];
         for(i=1; i<4; i++)
-            if(cardOrder.compare(cardsPlayed[i], cMax) > 0)
+            if(cardOrder.compare(cMax, cardsPlayed[i]) < 0)
             {
                 iMax = i;
                 cMax = cardsPlayed[i];
@@ -173,6 +173,8 @@ public class TableMaster {
         
         for(i=0; i<4; i++)
             agents[i].receiveRoundWinner(agents[iMax]);
+        
+        log.roundWon(agents[iMax]);
 
         return iMax;
     }
