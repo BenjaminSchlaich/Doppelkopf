@@ -6,6 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import game.gamemodes.ACardOrder;
+import game.gamemodes.BubensoloOrder;
+import game.gamemodes.DamensoloOrder;
+import game.gamemodes.FarbsoloOrder;
+import game.gamemodes.FleischlosOrder;
 import game.gamemodes.GameMode;
 import game.gamemodes.GameModeStateMachine;
 import game.gamemodes.NormalOrder;
@@ -123,11 +127,25 @@ public class TableMaster {
         switch(p.first)
         {
             case Normal:
+            case Armut:
+            case Hochzeit:
                 cardOrder = new NormalOrder();
                 break;
-        
-            default:
-                cardOrder = new NormalOrder();
+            case Damensolo:
+                cardOrder = new DamensoloOrder();
+                break;
+            case Bubensolo:
+                cardOrder = new BubensoloOrder();
+            case Kreuzsolo:
+                cardOrder = new FarbsoloOrder(Color.Kreuz);
+            case Piksolo:
+                cardOrder = new FarbsoloOrder(Color.Pik);
+            case Herzsolo:
+                cardOrder = new FarbsoloOrder(Color.Herz);
+            case Karosolo:
+                cardOrder = new FarbsoloOrder(Color.Karo);
+            case Fleischlos:
+                cardOrder = new FleischlosOrder();
         }
     }
 

@@ -48,23 +48,7 @@ public class NormalOrder extends ACardOrder {
         else if(o2.c == roundColor)
             return -1;
         else
-            return valueCompare(o1, o2);        // both Fehl
-    }
-
-    protected int colorCompare(Card c1, Card c2)
-    {
-        if(c1.c.ordinal() <= c2.c.ordinal())
-            return 1;
-        else
-            return -1;
-    }
-
-    protected int valueCompare(Card c1, Card c2)
-    {
-        if(c1.v.ordinal() <= c2.v.ordinal())
-            return 1;
-        else
-            return -1;
+            return 2*colorCompare(o1, o2) + valueCompare(o1, o2);        // both Fehl
     }
 
     public boolean isTrump(Card c)

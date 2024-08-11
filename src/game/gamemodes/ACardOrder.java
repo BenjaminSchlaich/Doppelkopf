@@ -26,6 +26,22 @@ public abstract class ACardOrder implements Comparator<Card> {
 
     public abstract boolean isTrump(Card c);
 
+    protected int colorCompare(Card c1, Card c2)
+    {
+        if(c1.c.ordinal() <= c2.c.ordinal())
+            return 1;
+        else
+            return -1;
+    }
+
+    protected int valueCompare(Card c1, Card c2)
+    {
+        if(c1.v.ordinal() <= c2.v.ordinal())
+            return 1;
+        else
+            return -1;
+    }
+
     protected Color roundColor = null;
 
 }

@@ -4,7 +4,6 @@ import java.util.Set;
 
 import game.AAgent;
 import game.Ansage;
-import game.IAgent;
 import game.Pair;
 
 public final class GameModeStateMachine {

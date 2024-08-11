@@ -3,8 +3,9 @@ import game.*;
 import logging.Log;
 
 public class App {
-    public static void main(String[] args) throws Exception {
-        
+
+    public static void runMatch()
+    {
         AAgent[] players = new AAgent[4];
         String[] names = new String[]{"Angela", "Viktor", "Bertha", "Thomas"};
 
@@ -18,5 +19,10 @@ public class App {
         tm.playList(1);
 
         System.out.println(l);
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        runMatch();
     }
 }
