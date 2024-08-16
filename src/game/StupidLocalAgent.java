@@ -11,14 +11,14 @@ public class StupidLocalAgent extends FullyRandomAgent
     @Override
     public Ansage sendAnsage(List<Ansage> valid)
     {
-        if(!saidGesund)
+        if(!madeAnsage)
         {
-            saidGesund = true;
-            return Ansage.Gesund;
+            madeAnsage = true;
+            return super.sendAnsage(valid);
         }
         else
             return Ansage.Nothing;
     }
     
-    boolean saidGesund = false;
+    boolean madeAnsage = false;
 }
