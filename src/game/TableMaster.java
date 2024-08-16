@@ -204,26 +204,26 @@ public class TableMaster {
 
         do
         {
-            a = agents[agentIndex].sendAnsage(valids);               // ask the current agent for his Ansage
-            valids.remove(a);                               // prohibit the same one twice
+            a = agents[agentIndex].sendAnsage(valids);                  // ask the current agent for his Ansage
+            valids.remove(a);                                           // prohibit the same one twice
 
             if(a != Ansage.Nothing)
             {
-                agentAnsagen.get(agentIndex).add(a);                 // memorize all Ansagen, of course.
-                log.ansageMade(a, agents[agentIndex]);               // also log this event externally.
+                agentAnsagen.get(agentIndex).add(a);                    // memorize all Ansagen, of course.
+                log.ansageMade(a, agents[agentIndex]);                  // also log this event externally.
             }                 
             
-            GameModeStateMachine.updateState(a, agents[agentIndex]); // figures out the game that will be played
+            GameModeStateMachine.updateState(a, agents[agentIndex]);    // figures out the game that will be played
 
-            for(int j=0; j<4; j++)                          // now tell all other agents about it
+            for(int j=0; j<4; j++)                                      // now tell all other agents about it
             {
                 if(j == agentIndex)
                     continue;
                 else
-                    agents[j].receiveAnsage(a, agents[agentIndex]);  // the agent himself must not be informed
+                    agents[j].receiveAnsage(a, agents[agentIndex]);     // the agent himself must not be informed
             }
 
-        } while(a != Ansage.Nothing);                       // and let any agent make as many unique Ansagen as they want.
+        } while(a != Ansage.Nothing);                                   // and let any agent make as many unique Ansagen as they want.
     }
 
     private final AAgent[] agents;                  // the agents playing at this table

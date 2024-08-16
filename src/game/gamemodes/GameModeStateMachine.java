@@ -6,6 +6,12 @@ import game.AAgent;
 import game.Ansage;
 import game.Pair;
 
+/**
+ * This state machine is used to determine the game that will be played after the bidding is over.
+ * Feed it with all the Ansagen in the right order, and it will return the right game-mode when
+ * calling the getState() function. Because everything is handeld statically, resetState() must be called
+ * before re-using the state machine.
+ */
 public final class GameModeStateMachine {
     
     public static void updateState(Ansage an, AAgent ag)
