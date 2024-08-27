@@ -14,7 +14,6 @@ public class App {
         
         Log l = new Log();
 
-        
         TableMaster tm = new TableMaster(players, l);
 
         tm.playList(1);
