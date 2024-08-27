@@ -22,7 +22,10 @@ public final class GameModeStateMachine {
             || gm == GameMode.Normal
             || gm == GameMode.Armut && an == Ansage.Hochzeit
             || (gm == GameMode.Armut || gm == GameMode.Hochzeit) && solo.contains(an))
+            {
                 gm = ansageToGameMode(an);
+                GameModeStateMachine.ag = ag;
+            }
         }
     }
 
@@ -34,6 +37,7 @@ public final class GameModeStateMachine {
     public static void resetState()
     {
         gm = null;
+        ag = null;
     }
 
     private static GameMode ansageToGameMode(Ansage a)

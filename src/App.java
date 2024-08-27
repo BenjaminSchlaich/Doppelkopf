@@ -10,7 +10,7 @@ public class App {
         String[] names = new String[]{"Angela", "Viktor", "Bertha", "Thomas"};
 
         for(int i=0; i<4; i++)
-            players[i] = new FullyRandomAgent(names[i]);
+            players[i] = new StupidLocalAgent(names[i]);
         
         Log l = new Log();
 
