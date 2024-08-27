@@ -1,5 +1,5 @@
 bin/**
 bin/game/StupidLocalAgent.class
 bin/App.class
-bin/App.class
+bin/StupidLocalAgent.class
 bin/game/gamemodes/GameModeStateMachine.class
