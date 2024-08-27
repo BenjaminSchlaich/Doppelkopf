@@ -197,6 +197,13 @@ public class TableMaster {
         return iMax;
     }
 
+    /**
+     * Ask the given player for an arbitrary number of Ansagen.
+     * If isMatchfinding is true, and the player announces "Nothing" before any GameMode, by default this will
+     * be interpreted as a proposal for "Normal". Agents should just well-behave lol
+     * @param agentIndex
+     * @param isMatchfinding if this is true, players must answer with a game-mode before they can say "Nothing"
+     */
     private void askForAnsagen(int agentIndex)
     {
         Ansage a;
@@ -211,10 +218,10 @@ public class TableMaster {
             {
                 agentAnsagen.get(agentIndex).add(a);                    // memorize all Ansagen, of course.
                 log.ansageMade(a, agents[agentIndex]);                  // also log this event externally.
-            }                 
+            }
             
             GameModeStateMachine.updateState(a, agents[agentIndex]);    // figures out the game that will be played
-
+            
             for(int j=0; j<4; j++)                                      // now tell all other agents about it
             {
                 if(j == agentIndex)

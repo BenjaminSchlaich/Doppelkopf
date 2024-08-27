@@ -16,16 +16,17 @@ public final class GameModeStateMachine {
     
     public static void updateState(Ansage an, AAgent ag)
     {
-        if(!irrelevant.contains(an))
+        GameMode m = ansageToGameMode(an);
+
+        if(gm == null
+        || gm == GameMode.Normal
+        || gm == GameMode.Armut && m == GameMode.Hochzeit
+        || (gm == GameMode.Armut || gm == GameMode.Hochzeit) && solo.contains(m))
         {
-            if(gm == null
-            || gm == GameMode.Normal
-            || gm == GameMode.Armut && an == Ansage.Hochzeit
-            || (gm == GameMode.Armut || gm == GameMode.Hochzeit) && solo.contains(an))
-            {
-                gm = ansageToGameMode(an);
-                GameModeStateMachine.ag = ag;
-            }
+            gm = ansageToGameMode(an);
+
+            if(m != GameMode.Normal)
+            GameModeStateMachine.ag = ag;
         }
     }
 
@@ -64,7 +65,5 @@ public final class GameModeStateMachine {
 
     private static AAgent ag = null;
 
-    private static final Set<Ansage> irrelevant = Set.of(Ansage.Re, Ansage.Kontra, Ansage.Unter_90, Ansage.Unter_60, Ansage.Unter_30, Ansage.Nothing);
-
-    private static final Set<Ansage> solo = Set.of(Ansage.Damensolo, Ansage.Bubensolo, Ansage.Kreuzsolo, Ansage.Piksolo, Ansage.Herzsolo, Ansage.Karosolo, Ansage.Fleischlos);
+    private static final Set<GameMode> solo = Set.of(GameMode.Damensolo, GameMode.Bubensolo, GameMode.Kreuzsolo, GameMode.Piksolo, GameMode.Herzsolo, GameMode.Karosolo, GameMode.Fleischlos);
 }

@@ -5,7 +5,7 @@ import java.util.Random;
 
 import game.gamemodes.GameMode;
 
-public class FullyRandomAgent extends AAgent {
+public final class FullyRandomAgent extends AAgent {
 
     public FullyRandomAgent(String name) {
         super(name);
@@ -16,7 +16,11 @@ public class FullyRandomAgent extends AAgent {
     @Override
     public Ansage sendAnsage(List<Ansage> valid) 
     {
-        return valid.get(rand.nextInt(valid.size()));
+        // this is not uniformly random, but avoids spamming Ansagen into the log.
+        if(rand.nextDouble() < 0.1)
+            return valid.get(rand.nextInt(valid.size()));
+        else
+            return Ansage.Nothing;
     }
 
     @Override
