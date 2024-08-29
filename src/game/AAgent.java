@@ -1,5 +1,7 @@
 package game;
 
+import java.util.List;
+
 /**
  * This interface declares the functionality that an agent (i.e. player) in the game must provide.
  * For a player to be able to participate, he must be able to:
@@ -18,15 +20,26 @@ public abstract class AAgent implements IAgent {
         this.hand = h;
     }
 
-    public final void receivePlayers(IAgent left, IAgent middle, IAgent right)
+    public final void receivePlayers(IAgent left, IAgent middle, IAgent right, TableMaster tm)
     {
         this.left = left;
         this.middle = middle;
         this.right = right;
+        this.tableMaster = tm;
+    }
+    
+    /**
+     * This can be used by agents for convenience, so they don't have to check what cards can be played.
+     * Use this to avoid making mistakes when sending your card to the tablemaster.
+     * @return a list with all cards from the hand that could be played atm.
+     */
+    protected final List<Card> validPlays()
+    {
+        return tableMaster.validForPlayer(this);
     }
 
     @Override
-    public String toString()
+    public final String toString()
     {
         return name;
     }
@@ -36,5 +49,5 @@ public abstract class AAgent implements IAgent {
     protected IAgent left;
     protected IAgent middle;
     protected IAgent right;
-
+    private TableMaster tableMaster;
 }

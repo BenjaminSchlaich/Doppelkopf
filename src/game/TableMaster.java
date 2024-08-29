@@ -21,7 +21,7 @@ import logging.Log;
  * start matches and rounds, hand out cards and summarize the list.
  * A list consists of multiple matches, which, in turn, consist of 12 rounds each.
  */
-public class TableMaster {
+public final class TableMaster {
 
     public TableMaster(AAgent[] agents, Log log)
     {
@@ -29,6 +29,8 @@ public class TableMaster {
             throw new IllegalArgumentException("Match(): must construct with exactly 4 agents.");
 
         this.agents = agents;
+
+        this.initialHands = new Hand[4];
 
         this.matchStartIndex = 0;
 
@@ -59,6 +61,81 @@ public class TableMaster {
         }
     }
 
+    /**
+     * Checks what cards the given player <a> is allowed to play right now.
+     * If it isn't <a>'s turn, and the player to come out hasn't played yet,
+     * it is unknown what cards <a> is allowed to play, and so an empty list will be returned.
+     * If, however, it is <a>'s turn, the method returns just the cards that can be legally played.
+     * @param a the agent to check for
+     * @return the list of all playable cards atm.
+     */
+    public List<Card> validForPlayer(AAgent a)
+    {
+        int id = -1;
+
+        for(int i=0; i<4; i++)
+            if(agents[i] == a)
+            {
+                id = i;
+                break;
+            }
+        
+        var l = new LinkedList<Card>();
+
+        if(id < 0)
+            return l;                           // this player doesn't even play here, so no valid cards exist!
+        
+        l.addAll(initialHands[id].getCards());
+
+        for(var cs: matchCardLog)
+            l.remove(cs[id]);                   // remove all cards that have been played by a before.
+        
+        if(roundStartLog.getLast() == id)       // if this player comes out, he can play whatever he wants
+            return l;
+        
+        // otherwise he has to obey the color!
+        if(matchCardLog.getLast()[roundStartLog.getLast()] == null)
+            return new LinkedList<>();          // the first player hasn't even played, so nothing is possible
+        
+        Card openingCard = matchCardLog.getLast()[roundStartLog.getLast()];
+        
+        boolean hasSameColor = false;
+
+        if(cardOrder.isTrump(openingCard))
+        {
+            for(Card c: l)
+                if(cardOrder.isTrump(c))
+                {
+                    hasSameColor = true;
+                    break;
+                }
+            
+            if(hasSameColor)
+                l.removeIf(c -> !cardOrder.isTrump(c));
+        }
+        else
+        {
+            for(Card c: l)
+                if(c.c == openingCard.c)
+                {
+                    hasSameColor = true;
+                    break;
+                }
+            
+            if(hasSameColor)
+                l.removeIf(c -> c.c != openingCard.c);
+        }
+
+        return l;
+    }
+
+    /*
+     * Organize the playing of one match, consisting of the following steps:
+     * 1. Hand out the cards to the players
+     * 2. Ask them for their Ansagen for the GameMode that will be played.
+     * 3. Play 12 rounds.
+     * 4. Update the matchStartIndex, so for the next match in the list the next player will start.
+     */
     private void playMatch()
     {
         handOutCards();
@@ -81,7 +158,7 @@ public class TableMaster {
     private void initializePlayers()
     {
         for(int i=0; i<4; i++)
-            agents[i].receivePlayers(agents[(i + 1) % 4], agents[(i + 2) % 4], agents[(i + 3) % 4]); 
+            agents[i].receivePlayers(agents[(i + 1) % 4], agents[(i + 2) % 4], agents[(i + 3) % 4], this); 
     }
 
     // give a random hand of cards to each player.
@@ -95,7 +172,9 @@ public class TableMaster {
         {
             Hand h = new Hand(s);
 
-            agents[i].receiveHand(h);
+            initialHands[i] = h;
+
+            agents[i].receiveHand(new Hand(h));
         }
     }
 
@@ -160,11 +239,22 @@ public class TableMaster {
 
         int i = roundStartIndex;
 
+        // edit: i moved this up before the loop, so that i have access during this match.
+        // this is important to check whether the colors are obeyed!
+        matchCardLog.add(cardsPlayed);              // log the cards played, so that consistency can be checked!
+
+        roundStartLog.add(roundStartIndex);         // without this log the matchCardLog is useless.
+
         do
         {
             askForAnsagen(i);
 
+            var canPlay = validForPlayer(agents[i]);
+
             cardsPlayed[i] = agents[i].sendCard();
+
+            if(!canPlay.contains(cardsPlayed[i]))
+                throw new IllegalStateException("Player " + agents[i] + " illegaly played a " + cardsPlayed[i]);
 
             log.cardPlayed(cardsPlayed[i], agents[i]);
 
@@ -174,10 +264,6 @@ public class TableMaster {
             i = (i+1) % 4;
 
         } while(i != roundStartIndex);
-
-        matchCardLog.add(cardsPlayed);              // log the cards played, so that consistency can be checked!
-
-        roundStartLog.add(roundStartIndex);         // without this log the matchCardLog is useless.
 
         // find the winner
         int iMax = 0;
@@ -234,6 +320,8 @@ public class TableMaster {
     }
 
     private final AAgent[] agents;                  // the agents playing at this table
+
+    private final Hand[] initialHands;              // and their respective initial hands
 
     private ArrayList<List<Ansage>> agentAnsagen;   // logs the Ansagen that have been made during the current/last match
 

@@ -37,9 +37,20 @@ public final class FullyRandomAgent extends AAgent {
     @Override
     public Card sendCard() {
         
-        int cardsLeft = hand.getCards().size();
+        var valid = validPlays();
 
-        return hand.playCard(rand.nextInt(cardsLeft));
+        Card c = valid.get(rand.nextInt(valid.size()));
+
+        // find the index of this card.
+        int ind = 0;
+
+        for(Card cc: hand.getCards())
+            if(c.equals(cc))
+                break;
+            else
+                ind++;
+
+        return hand.playCard(ind);
     }
 
     @Override
