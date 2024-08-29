@@ -1,7 +1,11 @@
 {
-    "java.project.sourcePaths": ["src"],
+    "java.project.sourcePaths": [
+        "src",
+        "test"
+    ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
-    ]
+        "/Users/benjaminschlaich/Coding/Java/Doppelkopf/lib/junit-platform-console-standalone-1.11.0.jar"
+    ],
+
 }

@@ -23,10 +23,15 @@ import logging.Log;
  */
 public final class TableMaster {
 
+    /**
+     * Construct a tablemaster for a new table with the agents given, logging into <log>
+     * @param agents    must be a non-null array with exactly 4 non-null agents.
+     * @param log       the log where the tablemaster dumps status info on the games that run.
+     */
     public TableMaster(AAgent[] agents, Log log)
     {
-        if(agents.length != 4)
-            throw new IllegalArgumentException("Match(): must construct with exactly 4 agents.");
+        if(agents == null || agents.length != 4)
+            throw new IllegalArgumentException("Match(): must construct with exactly 4 non-null agents.");
 
         this.agents = agents;
 
@@ -37,7 +42,12 @@ public final class TableMaster {
         this.agentAnsagen = new ArrayList<List<Ansage>>(4);
 
         for(int i=0; i<4; i++)
+        {
+            if(agents[i] == null)
+                throw new IllegalArgumentException("Match(): cannot construct with null-agents.");
+
             agentAnsagen.add(new LinkedList<Ansage>());
+        }
         
         this.matchCardLog = null;
 
@@ -47,13 +57,13 @@ public final class TableMaster {
     /**
      * Play matchCount matches with the agents that were specified.
      */
-    public void playList(int matchCound)
+    public void playList(int matchCount)
     {
         initializePlayers();
 
-        for(int i=0; i<matchCound; i++)
+        for(int i=0; i<matchCount; i++)
         {
-            log.matchStarted(matchCound, agents);
+            log.matchStarted(matchCount, agents);
 
             playMatch();
 
