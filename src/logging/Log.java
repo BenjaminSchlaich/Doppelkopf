@@ -2,6 +2,7 @@ package logging;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Arrays;
 
 import game.AAgent;
 import game.Ansage;
@@ -24,6 +25,11 @@ public class Log {
         logEntries.add("-".repeat(100));
     }
 
+    public void gameModeProposal(GameMode m, AAgent a)
+    {
+        logLevel(2, "Player " + a + " proposed a " + m + " match.");
+    }
+
     public void gameModeChosen(GameMode m, AAgent a)
     {
         if(m == GameMode.Normal)
@@ -39,12 +45,26 @@ public class Log {
     
     public void cardPlayed(Card ca, AAgent ag)
     {
-        logLevel(2, "Player " + ag + " played a " + ca + ".");
+        logLevel(3, "Player " + ag + " played a " + ca + ".");
     }
 
     public void roundWon(AAgent a)
     {
         logLevel(2, "Player " + a + " got the Stich.");
+    }
+
+    public void matchResult(int[] scores)
+    {
+        logLevel(1, "Match results: " + Arrays.toString(scores));
+    }
+
+    public void listResult(int[] scores)
+    {
+        logEntries.add("-".repeat(100));
+        
+        logEntries.add("List results: " + Arrays.toString(scores));
+
+        logEntries.add("-".repeat(100));
     }
 
     @Override

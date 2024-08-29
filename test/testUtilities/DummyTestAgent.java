@@ -49,5 +49,11 @@ public class DummyTestAgent extends AAgent {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'receiveRoundWinner'");
     }
+
+    @Override
+    public GameMode sendGameMode() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'sendGameMode'");
+    }
     
 }

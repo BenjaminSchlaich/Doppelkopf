@@ -3,7 +3,6 @@ package game.gamemodes;
 import java.util.Set;
 
 import game.AAgent;
-import game.Ansage;
 import game.Pair;
 
 /**
@@ -14,16 +13,14 @@ import game.Pair;
  */
 public final class GameModeStateMachine {
     
-    public static void updateState(Ansage an, AAgent ag)
+    public static void updateState(GameMode m, AAgent ag)
     {
-        GameMode m = ansageToGameMode(an);
-
         if(gm == null
         || gm == GameMode.Normal
         || gm == GameMode.Armut && m == GameMode.Hochzeit
         || (gm == GameMode.Armut || gm == GameMode.Hochzeit) && solo.contains(m))
         {
-            gm = ansageToGameMode(an);
+            gm = m;
 
             if(m != GameMode.Normal)
             GameModeStateMachine.ag = ag;
@@ -39,26 +36,6 @@ public final class GameModeStateMachine {
     {
         gm = null;
         ag = null;
-    }
-
-    private static GameMode ansageToGameMode(Ansage a)
-    {
-        // relevant: Gesund, Armut, Hochzeit, Damensolo, Bubensolo, Kreuzsolo, Piksolo, Herzsolo, Karosolo, Fleischlos
-        switch (a) {
-            case Gesund: return GameMode.Normal;
-            case Armut: return GameMode.Armut;
-            case Hochzeit: return GameMode.Hochzeit;
-            case Damensolo: return GameMode.Damensolo;
-            case Bubensolo: return GameMode.Bubensolo;
-            case Kreuzsolo: return GameMode.Kreuzsolo;
-            case Piksolo: return GameMode.Piksolo;
-            case Herzsolo: return GameMode.Herzsolo;
-            case Karosolo: return GameMode.Karosolo;
-            case Fleischlos: return GameMode.Fleischlos;
-
-            default:
-                return GameMode.Normal;
-        }
     }
 
     private static GameMode gm = null;

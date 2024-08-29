@@ -2,6 +2,7 @@ package game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,6 +21,11 @@ import logging.Log;
  * He is responsible for administering the communication between the players (i.e. agents) who participate,
  * start matches and rounds, hand out cards and summarize the list.
  * A list consists of multiple matches, which, in turn, consist of 12 rounds each.
+ * 
+ * Some more nomenclature:
+ * Value = The value of a card for beating other cards in play.
+ * Point = The points that cards award when winning them for a certain match.
+ * Score = The score that is evaluated at the end of each match for all players, and summed up for the whole list.
  */
 public final class TableMaster {
 
@@ -34,6 +40,8 @@ public final class TableMaster {
             throw new IllegalArgumentException("Match(): must construct with exactly 4 non-null agents.");
 
         this.agents = agents;
+
+        this.playerAcceptedArmut = null;
 
         this.initialHands = new Hand[4];
 
@@ -51,6 +59,10 @@ public final class TableMaster {
         
         this.matchCardLog = null;
 
+        this.roundStartLog = null;
+
+        this.listScore = null;
+
         this.log = log;
     }
 
@@ -61,13 +73,20 @@ public final class TableMaster {
     {
         initializePlayers();
 
+        listScore = new int[4];
+
         for(int i=0; i<matchCount; i++)
         {
             log.matchStarted(matchCount, agents);
 
             playMatch();
 
-            matchStartIndex++;
+            var matchScore = countScoreForMatch();
+
+            log.matchResult(matchScore);
+
+            for(int id=0; id<4; id++)
+                listScore[id] += matchScore[id];
         }
     }
 
@@ -159,7 +178,9 @@ public final class TableMaster {
         roundStartLog = new LinkedList<Integer>();
 
         for(int round=0; round<12; round++)
+        {
             roundStartIndex = playRound(roundStartIndex);
+        }
         
         matchStartIndex++;
     }
@@ -200,7 +221,11 @@ public final class TableMaster {
 
         do
         {
-            askForAnsagen(i);
+            GameMode gm = agents[i].sendGameMode();
+
+            log.gameModeProposal(gm, agents[i]);
+
+            GameModeStateMachine.updateState(gm, agents[i]);
 
             i = (i+1) % 4;                                      // select the next agent
 
@@ -305,6 +330,9 @@ public final class TableMaster {
         Ansage a;
         List<Ansage> valids = new LinkedList<>(Arrays.asList(Ansage.values()));
 
+        // don't allow the same Ansage twice!
+        valids.removeIf(aa -> agentAnsagen.get(agentIndex).contains(aa));
+
         do
         {
             a = agents[agentIndex].sendAnsage(valids);                  // ask the current agent for his Ansage
@@ -315,8 +343,6 @@ public final class TableMaster {
                 agentAnsagen.get(agentIndex).add(a);                    // memorize all Ansagen, of course.
                 log.ansageMade(a, agents[agentIndex]);                  // also log this event externally.
             }
-            
-            GameModeStateMachine.updateState(a, agents[agentIndex]);    // figures out the game that will be played
             
             for(int j=0; j<4; j++)                                      // now tell all other agents about it
             {
@@ -329,7 +355,148 @@ public final class TableMaster {
         } while(a != Ansage.Nothing);                                   // and let any agent make as many unique Ansagen as they want.
     }
 
+    private int[] countScoreForMatch()
+    {
+        int[] points = new int[4];
+
+        for(var round: matchCardLog)
+            for(int i=0; i<4; i++)
+                points[i] += round[i].getPoints();
+        
+        Pair<GameMode, AAgent> matchConfig = GameModeStateMachine.getState();
+
+        List<Integer> reTeamInds = new LinkedList<>();
+        List<Integer> contraTeamInds = new LinkedList<>();
+
+        boolean solo = false;
+
+        switch(matchConfig.first)
+        {
+            case Normal:
+                // find the players with Kreuzdamen
+                Card kd = new Card(Value.Dame, Color.Kreuz);
+
+                for(int i=0; i<4; i++)
+                    if(initialHands[i].getCards().contains(kd))
+                        reTeamInds.add(i);
+                    else
+                        contraTeamInds.add(i);
+
+                break;
+
+            case Armut:
+
+                // find the players who announced and accepted the armut
+                for(int i=0; i<4; i++)
+                    if(agents[i] == matchConfig.second || agents[i] == playerAcceptedArmut)
+                        reTeamInds.add(i);
+                    else
+                        contraTeamInds.add(i);
+
+                break;
+            
+            case Hochzeit:
+
+                // the player who announced the Hochzeit is Re for sure, find him!
+                for(int i=0; i<4; i++)
+                    if(agents[i] == matchConfig.second)
+                        reTeamInds.add(i);
+                
+                // in the first or second round, there might have been anothe winner, if so, find him and add to Re!
+                for(int i=1; i<=2; i++)
+                    if(roundStartLog.get(i) != reTeamInds.getFirst())
+                    {
+                        reTeamInds.add(i);
+                        break;
+                    }
+                
+                // the players who aren't re by now are contra
+                for(int i=0; i<4; i++)
+                    if(!reTeamInds.contains(i))
+                        contraTeamInds.add(i);
+                
+                break;
+            
+            default:
+                // solo play, only the player who announced is re
+                solo = true;
+                
+                for(int i=0; i<4; i++)
+                    if(agents[i] == matchConfig.second)
+                        reTeamInds.add(i);
+                    else
+                        contraTeamInds.add(i);
+        }
+
+        int rePoints = 0;
+        int contraPoints = 0;
+
+        for(int i: reTeamInds)
+            rePoints += points[i];
+        
+        for(int i: contraTeamInds)
+            contraPoints += points[i];
+        
+        if(rePoints + contraPoints != 240)
+            throw new Error("Re + Kontra points should equal to 240, but equals to " + rePoints + contraPoints);
+        
+        // COMPUTE THE BASE SCORE
+        int reScore = rePoints > 120 ? 1 : -1;
+
+        // COMPUTE EXTRA POINTS FOR HIGH POINTS
+        int diff = Math.abs(120 - rePoints);
+
+        if(diff > 90)       // unter 30
+            reScore *= 4;
+        else if(diff > 60)  // unter 60
+            reScore *= 3;
+        else if(diff > 30)  // unter 90
+            reScore *= 2;
+        
+        // COMPUTE EXTRA POINTS FOR DOPPELKOPF
+        Iterator<Card[]> itCards = matchCardLog.iterator();
+        Iterator<Integer> itStart = roundStartLog.iterator();
+
+        while(itCards.hasNext())
+        {
+            int sumCardPoints = 0;
+            
+            Card[] cs = itCards.next();
+            int startI = itStart.next();
+
+            for(Card c:  cs)
+                sumCardPoints += c.getPoints();
+            
+            if(sumCardPoints >= 40)
+            {
+                if(reTeamInds.contains(startI))
+                    reScore++;
+                else
+                    reScore--;
+            }
+        }
+
+        // COMPUTE EXTRA POINTS FOR CATCHING FUCHS
+        // TODO: implement
+
+
+        int[] score = new int[4];
+
+        for(int i: reTeamInds)
+            if(solo)
+                score[i] = reScore*3;
+            else
+                score[i] = reScore;
+        
+        for(int i: contraTeamInds)
+            score[i] = -reScore;
+
+        return score;
+    }
+
     private final AAgent[] agents;                  // the agents playing at this table
+
+    private final AAgent playerAcceptedArmut;       // if this is non-null, a armut is/was played, and this is the accepting player.
 
     private final Hand[] initialHands;              // and their respective initial hands
 
@@ -338,6 +505,8 @@ public final class TableMaster {
     private List<Card[]> matchCardLog;              // logs the cards that have been played during the current/last match
 
     private List<Integer> roundStartLog;            // provides matchCardLog with the indices of the agent that came out.
+
+    private int[] listScore;                        // counter of all the list-score collected so far.
 
     private ACardOrder cardOrder;                   // the card order that holds currently (during matches/rounds)
 

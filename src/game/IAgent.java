@@ -26,6 +26,13 @@ public interface IAgent {
     public void receiveAnsage(Ansage a, IAgent p);
 
     /**
+     * Ask the player to tell the GameMode that he would like to play.
+     * This will be called exactly once before every match.
+     * @return the desired GameMode
+     */
+    public GameMode sendGameMode();
+
+    /**
      * The player is informed about the game mode that will be played, and, if applicable, who initiated it (for non-Normal)
      * @param m the mode that will be played
      * @param a null in case of another game mode but Normal.

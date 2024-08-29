@@ -16,9 +16,8 @@ public final class FullyRandomAgent extends AAgent {
     @Override
     public Ansage sendAnsage(List<Ansage> valid) 
     {
-        // this is not uniformly random, but avoids spamming Ansagen into the log.
-        if(rand.nextDouble() < 0.1)
-            return valid.get(rand.nextInt(valid.size()));
+        if(valid.size() > 0 && rand.nextDouble() < 0.1)
+                return valid.get(rand.nextInt(valid.size()));
         else
             return Ansage.Nothing;
     }
@@ -62,5 +61,12 @@ public final class FullyRandomAgent extends AAgent {
     public void receiveRoundWinner(IAgent a) {
         // what should a random player care?
     }
-    
+
+    int ansageCount = 0;
+
+    @Override
+    public GameMode sendGameMode() {
+        // TODO Auto-generated method stub
+        return GameMode.values()[rand.nextInt(GameMode.values().length)];
+    }
 }
